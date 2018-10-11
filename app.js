@@ -52,6 +52,10 @@ app.get("/allData", function(req,res){
     });
 });
 
+app.get("/test", function(req,res){
+    res.send("Test123");
+});
+
 app.get("/Ddata", function(req,res){
     garage.create({
         name: "SJSUSouth",
