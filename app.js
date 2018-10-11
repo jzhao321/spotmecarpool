@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var hike = require("./routes/hike");
+var Sequelize = require("sequelize");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -20,13 +20,71 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 
-app.get("/hikes", hike.index);
-app.post("/add_hike", hike.add_hike);
-// app.use('/', indexRouter);
-app.get("/", function(req,res){
-  res.send("Hello");
-})
-app.use('/users', usersRouter);
+
+var seq = new Sequelize("spotme_garages", "root", "spot123", {
+    host: "35.227.173.37",
+    dialect: "mysql",
+    operatorsAliases:false,
+
+    pool:{
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+});
+
+const garage = seq.define("garage", {
+    name: {
+        type: Sequelize.STRING
+    },
+    current:{
+        type: Sequelize.INTEGER
+    },
+    max:{
+        type: Sequelize.INTEGER
+    }
+});
+
+app.get("/allData", function(req,res){
+    garage.findAll().then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+app.get("/Ddata", function(req,res){
+    garage.create({
+        name: "SJSUSouth",
+        current: 300,
+        max:500
+        
+    }).then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+
+app.get("/create", function(req,res){
+    garage.sync({force:true}).then(function(result){
+        console.log(result);
+    });
+});
+
+app.post("/garage", function(req, res){
+    garage.find({
+        where:{
+            name: req.body.name
+        },
+        attributes:{
+            exclude: ["createdAt","updatedAt"]
+        }
+
+    }).then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
