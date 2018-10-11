@@ -10,6 +10,8 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+var route = express.Router();
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -45,30 +47,22 @@ const garage = seq.define("garage", {
     }
 });
 
-app.get("/testConnect", function(req,res){
-    seq.authenticate().then(function(errors){
-        res.send("Connection Established");
-    }).catch(function(err){
-        console.error("Unable to connect to the database: ", err);
-        res.send("Unable to connect to the database");
-    })
-})
-
 app.get("/", function(req,res){
-    res.send("Test home page");
+    res.send("Spot Me Solutions API");
 });
 
-app.get("/allData", function(req,res){
+
+route.get("/allData", function(req,res){
     garage.findAll().then(function(result){
         res.send(JSON.stringify(result));
     });
 });
 
-app.get("/test", function(req,res){
+route.get("/test", function(req,res){
     res.send("Test123");
 });
 
-app.get("/Ddata", function(req,res){
+route.get("/Ddata", function(req,res){
     garage.create({
         name: "SJSUSouth",
         current: 300,
@@ -79,12 +73,20 @@ app.get("/Ddata", function(req,res){
     });
 });
 
-
-app.get("/create", function(req,res){
-    garage.sync({force:true}).then(function(result){
-        console.log(result);
+route.get("/testConnect", function(req,res){
+    seq.authenticate().then(function(errors){
+        res.send("Connection Established");
+    }).catch(function(err){
+        console.error("Unable to connect to the database: ", err);
+        res.send("Unable to connect to the database");
     });
 });
+
+// app.get("/create", function(req,res){
+//     garage.sync({force:true}).then(function(result){
+//         console.log(result);
+//     });
+// });
 
 app.post("/garage", function(req, res){
     garage.find({
@@ -99,6 +101,8 @@ app.post("/garage", function(req, res){
         res.send(JSON.stringify(result));
     });
 });
+
+app.use("/debug", route);
 
 
 
