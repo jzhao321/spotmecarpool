@@ -47,7 +47,7 @@ const garage = seq.define("garage", {
 
 app.get("/testConnect", function(req,res){
     seq.authenticate().then(function(errors){
-        //console.log("broken"); 
+        res.send("Connection Established");
     }).catch(function(err){
         console.error("Unable to connect to the database: ", err);
         res.send("Unable to connect to the database");
