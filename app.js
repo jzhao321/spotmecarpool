@@ -24,7 +24,6 @@ app.use(cookieParser());
 var seq = new Sequelize("spotme_garages", "root", "spot123", {
     host: "35.227.173.37",
     dialect: "mysql",
-    operatorsAliases:false,
 
     pool:{
         max: 5,
@@ -45,6 +44,15 @@ const garage = seq.define("garage", {
         type: Sequelize.INTEGER
     }
 });
+
+app.get("/testConnect", function(req,res){
+    seq.authenticate().then(function(errors){
+        //console.log("broken"); 
+    }).catch(function(err){
+        console.error("Unable to connect to the database: ", err);
+        res.send("Unable to connect to the database");
+    })
+})
 
 app.get("/", function(req,res){
     res.send("Test home page");
