@@ -22,7 +22,10 @@ app.use(cookieParser());
 
 app.get("/hikes", hike.index);
 app.post("/add_hike", hike.add_hike);
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
+app.get("/", function(req,res){
+  res.send("Hello");
+})
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
