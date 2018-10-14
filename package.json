@@ -13,6 +13,11 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
     "mysql2": "^1.6.1",
+<<<<<<< HEAD
     "sequelize": "^4.39.0"
+=======
+    "sequelize": "^4.39.0",
+    "statuses": "^1.5.0"
+>>>>>>> 2c45c0aec04d81a33aece8c60d9417d400a663c9
   }
 }
