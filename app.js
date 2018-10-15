@@ -38,6 +38,19 @@ var seq = new Sequelize("spotme_garages", "root", "spot123", {
     }
 });
 
+var seqSign = new Sequelize("signups", "root", "spot123", {
+    host: "35.227.173.37",
+    dialect: "mysql",
+    operatorsAliases:false,
+
+    pool:{
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+});
+
 const garage = seq.define("garage", {
     name: {
         type: Sequelize.STRING
@@ -48,6 +61,9 @@ const garage = seq.define("garage", {
     max:{
         type: Sequelize.INTEGER
     }
+});
+
+const signup = seqSign.define("signup", {
 });
 
 app.get("/", function(req,res){
@@ -144,6 +160,27 @@ app.post("/updateGarage", function(req, res){
         res.send(result);
     });
 });
+
+app.get("/createSignup", function(req,res){
+    signup.sync({force: true}).then(function(result){
+        res.send("Signup has been created");
+    });
+});
+
+app.get("/signUpData", function(req,res){
+    signup.findAll({}).then(function(result){
+        res.send(result);
+    });
+});
+
+app.get("/redirect", function(req,res){
+    signup.create({
+    }).then(function(result){
+        res.redirect("https://www.spotmesolutions.com");
+    });
+});
+
+
 
 
 
