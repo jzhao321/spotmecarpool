@@ -92,6 +92,26 @@ route.get("/testConnect", function(req,res){
     });
 });
 
+route.post("/addGarage", function(req,res){
+    garage.create({
+        name: req.body.name,
+        current: req.body.current,
+        max: req.body.max
+    }).then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.post("/delGarage", function(req,res){
+    garage.destroy({
+        where: {
+            name: req.body.name
+        }
+    }).then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
 // app.get("/create", function(req,res){
 //     garage.sync({force:true}).then(function(result){
 //         console.log(result);
@@ -111,6 +131,8 @@ app.post("/garage", function(req, res){
         res.send(JSON.stringify(result));
     });
 });
+
+
 
 app.use("/debug", route);
 
