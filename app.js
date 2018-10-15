@@ -132,6 +132,19 @@ app.post("/garage", function(req, res){
     });
 });
 
+app.post("/updateGarage", function(req, res){
+    garage.update({
+        max: req.body.max,
+        current: req.body.current
+    },{
+        where:{
+            name: req.body.name
+        }
+    }).then(function(result){
+        res.send(result);
+    });
+});
+
 
 
 app.use("/debug", route);
