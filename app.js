@@ -101,10 +101,6 @@ route.get("/allData", function(req,res){
     });
 });
 
-route.get("/test", function(req,res){
-    res.send("Test123");
-});
-
 route.get("/testConnect", function(req,res){
     seq.authenticate().then(function(errors){
         res.send("Connection Established");
@@ -131,6 +127,21 @@ route.post("/delGarage", function(req,res){
         }
     }).then(function(result){
         res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/updateGarage", function(req,res){
+    garage.update({
+        current:req.query.current,
+        max: req.query.max,
+        upCount: req.query.upCount,
+        downCount: req.query.downCount
+    },{
+        where:{
+            name: req.query.name
+        }
+    }).then(function(result){
+        res.send(result);
     });
 });
 
