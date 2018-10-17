@@ -11,6 +11,8 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+var Op = Sequelize.Op;
+
 app.use(cors());
 
 var route = express.Router();
@@ -88,7 +90,8 @@ const signup = seqSign.define("signup", {
 
 const log = logData.define("timeLog", {
     garage: Sequelize.STRING,
-    current: Sequelize.INTEGER
+    current: Sequelize.INTEGER,
+    time: Sequelize.BIGINT
 });
 
 
@@ -201,6 +204,7 @@ app.get("/log_garage", function(req, res){
     if(req.query.API_KEY == "56ZXRQKLUO2i9P4DQMPH"){ //This is the API Key
         var toadd = 0;
         var count;
+        var date = new Date();
         if(req.query.command == "out"){
             toadd = -1;
             count = "downCount";
@@ -226,10 +230,12 @@ app.get("/log_garage", function(req, res){
 
                 log.create({
                     garage: req.query.location,
-                    current: result2.current
+                    current: result2.current,
+                    time: date.getTime()
                 }).then(function(result3){
 
                     res.send(JSON.stringify(result))
+                    
 
                 });
 
@@ -250,15 +256,28 @@ app.get("/getTest", function(req,res){
     });
 });
 
-app.get("/test3", function(req,res){
-    garage.find({
-        where: {
-            name: "SJSouth"
-        }
-    }).then(function(result){
-        
-    });
-});
+app.get("/getTime", function(req,res){
+    if(req.query.API_KEY == "56ZXRQKLUO2i9P4DQMPH"){
+        log.findAll({
+            where:{
+                garage: req.query.location,
+                time: {
+                    [Op.gt]: parseInt(req.query.time) - 3600000,
+                    [Op.lt]: parseInt(req.query.time) + 3600000
+                }
+            },
+            attributes:{
+                include:["current", "time"]
+            }
+        }).then(function(result){
+            res.send(JSON.stringify(result));
+        })
+    }
+    else{
+        res.send("API Key Invalid");
+    }
+})
+
 
 // app.get("/addColumn", function(req,res){
 //    garage.update({
