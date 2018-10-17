@@ -248,22 +248,48 @@ app.get("/log_garage", function(req, res){
     }
 });
 
-app.get("/getTest", function(req,res){
-    garage.findAll().then(function(result){
-        var date = JSON.stringify(result[0].createdAt);
-        var date2 = new Date(date.substring(1,date.length - 1));
-        res.send(date2.getTime() + "");
-    });
+// app.get("/getTest", function(req,res){
+//     garage.findAll().then(function(result){
+//         var date = JSON.stringify(result[0].createdAt);
+//         var date2 = new Date(date.substring(1,date.length - 1));
+//         res.send(date2.getTime() + "");
+//     });
+// });
+
+app.get("/fakeData", function(req,res){
+    var date = Date.now();
+    var count = 0;
+    for(var i = date; i >= (date - 100 * 360000); i -= 360000){
+        log.create({
+            garage:"SJSouth",
+            current: count * 5,
+            time: i
+        })
+        count++;
+    }
+    res.send(date + "");
+
+
 });
 
 app.get("/getTime", function(req,res){
     if(req.query.API_KEY == "56ZXRQKLUO2i9P4DQMPH"){
+        var space = (parseInt(req.query.to) - parseInt(req.query.from)) / (parseInt(req.query.count) * 2) ;
+        var groups = [];
+        var average = [];
+        for(var count = 0; count < req.query.count; count++){
+            groups.push({
+                min: Math.floor((parseInt(req.query.from ) + space * 2 * count) - space),
+                max: Math.floor((parseInt(req.query.from ) + space * 2 * count) + space)
+            });
+        }
+        console.log(groups);
         log.findAll({
             where:{
                 garage: req.query.location,
                 time: {
-                    [Op.gt]: parseInt(req.query.time) - 3600000,
-                    [Op.lt]: parseInt(req.query.time) + 3600000
+                    [Op.gt]: parseInt(req.query.from),
+                    [Op.lt]: parseInt(req.query.to)
                 }
             },
             attributes:{
@@ -271,13 +297,27 @@ app.get("/getTime", function(req,res){
                 exclude:["id", "garage", "createdAt", "updatedAt"]
             }
         }).then(function(result){
-            res.send(JSON.stringify(result));
-        })
+            for(var i = 0; i < groups.length; i++){
+                var sum = 0;
+                var count = 0;
+                result.forEach(function(item,index){
+                    if(item.time < groups[i].max && item.time >= groups[i].min){
+                        sum += item.current;
+                        count++;
+                    }
+                });
+                average.push({
+                    avg:sum / count,
+                    time:(groups[i].max + groups[i].min) / 2
+                });
+            }
+            res.send(JSON.stringify(average));
+        });
     }
     else{
         res.send("API Key Invalid");
     }
-})
+});
 
 
 // app.get("/addColumn", function(req,res){
