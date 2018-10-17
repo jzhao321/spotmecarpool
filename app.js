@@ -38,7 +38,7 @@ var seq = new Sequelize("spotme_garages", "root", "spot123", {
     }
 });
 
-const garage = seq.define("garage", {
+var garage = seq.define("garages", {
     name: {
         type: Sequelize.STRING
     },
@@ -47,12 +47,18 @@ const garage = seq.define("garage", {
     },
     max:{
         type: Sequelize.INTEGER
+    },
+    upCount:{
+        type: Sequelize.INTEGER
+    },
+    downCount:{
+        type: Sequelize.INTEGER
     }
 });
 
-app.get("/", function(req,res){
-    res.send("Spot Me Solutions API");
-});
+// app.get("/", function(req,res){
+//     res.send("Spot Me Solutions API");
+// });
 
 
 route.get("/allData", function(req,res){
@@ -132,6 +138,51 @@ app.post("/garage", function(req, res){
     });
 });
 
+app.get("/log_garage", function(req, res){
+    if(req.query.API_KEY == "56ZXRQKLUO2i9P4DQMPH"){ //This is the API Key
+        var toadd = 0;
+        var count;
+        if(req.query.command == "out"){
+            toadd = -1;
+            count = "downCount";
+        }
+        else{
+            toadd = 1;
+            count = "upCount";
+        }
+        garage.update({
+            [count]: Sequelize.literal(count + " + 1"),
+            current: Sequelize.literal("current + 1" + toadd)
+        }, {
+            where: {
+                name: req.query.location
+            }
+        }).then(function(result){
+            res.send(result);
+        });
+    }
+    else{
+        res.send("API Key Invalid");
+    }
+});
+
+// app.get("/getTest", function(req,res){
+//     res.send(req.query.timestamp);
+// });
+
+// app.get("/addColumn", function(req,res){
+//    garage.update({
+//        upCount: 0,
+//        downCount: 0
+//    }, {
+//        where:{
+//            name:["SJSouth", "SJWest", "SJNorth"]
+//        }
+//    }).then(function(result){
+//        res.send(result);
+//    });
+
+// });
 
 
 app.use("/debug", route);
