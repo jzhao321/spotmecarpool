@@ -38,7 +38,21 @@ var seq = new Sequelize("spotme_garages", "root", "spot123", {
     }
 });
 
-var garage = seq.define("garages", {
+
+var seqSign = new Sequelize("signups", "root", "spot123", {
+    host: "35.227.173.37",
+    dialect: "mysql",
+    operatorsAliases:false,
+
+    pool:{
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+});
+
+const garage = seq.define("garage", {
     name: {
         type: Sequelize.STRING
     },
@@ -56,20 +70,12 @@ var garage = seq.define("garages", {
     }
 });
 
-// app.get("/", function(req,res){
-//     res.send("Spot Me Solutions API");
-// });
-
-
-route.get("/allData", function(req,res){
-    garage.findAll().then(function(result){
-        res.send(JSON.stringify(result));
-    });
+const signup = seqSign.define("signup", {
 });
 
-route.get("/test", function(req,res){
-    res.send("Test123");
-});
+
+
+
 
 // app.get("/Ddata", function(req,res){
 //     garage.create({
@@ -88,6 +94,16 @@ route.get("/test", function(req,res){
 //         console.log(result);
 //     });
 // });
+
+route.get("/allData", function(req,res){
+    garage.findAll().then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/test", function(req,res){
+    res.send("Test123");
+});
 
 route.get("/testConnect", function(req,res){
     seq.authenticate().then(function(errors){
