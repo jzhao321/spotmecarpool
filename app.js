@@ -267,7 +267,8 @@ app.get("/getTime", function(req,res){
                 }
             },
             attributes:{
-                include:["current", "time"]
+                include:["current", "time"],
+                exclude:["id", "garage", "createdAt", "updatedAt"]
             }
         }).then(function(result){
             res.send(JSON.stringify(result));
