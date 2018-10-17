@@ -52,6 +52,19 @@ var seqSign = new Sequelize("signups", "root", "spot123", {
     }
 });
 
+var logData = new Sequelize("garageTimeData", "root", "spot123", {
+    host: "35.227.173.37",
+    dialect: "mysql",
+    operatorsAliases:false,
+
+    pool:{
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+});
+
 const garage = seq.define("garage", {
     name: {
         type: Sequelize.STRING
@@ -71,6 +84,11 @@ const garage = seq.define("garage", {
 });
 
 const signup = seqSign.define("signup", {
+});
+
+const log = logData.define("timeLog", {
+    garage: Sequelize.STRING,
+    current: Sequelize.INTEGER
 });
 
 
@@ -97,6 +115,20 @@ const signup = seqSign.define("signup", {
 
 route.get("/allData", function(req,res){
     garage.findAll().then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/allLogData", function(req,res){
+    log.findAll().then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/clearLogTable", function(req,res){
+    log.sync({
+        force: true
+    }).then(function(result){
         res.send(JSON.stringify(result));
     });
 });
@@ -179,13 +211,30 @@ app.get("/log_garage", function(req, res){
         }
         garage.update({
             [count]: Sequelize.literal(count + " + 1"),
-            current: Sequelize.literal("current + 1" + toadd)
+            current: Sequelize.literal("current + 1")
         }, {
             where: {
                 name: req.query.location
             }
         }).then(function(result){
-            res.send(result);
+
+            garage.find({
+                where:{
+                    name: req.query.location
+                }
+            }).then(function(result2){
+
+                log.create({
+                    garage: req.query.location,
+                    current: result2.current
+                }).then(function(result3){
+
+                    res.send(JSON.stringify(result))
+
+                });
+
+            });
+
         });
     }
     else{
@@ -193,9 +242,23 @@ app.get("/log_garage", function(req, res){
     }
 });
 
-// app.get("/getTest", function(req,res){
-//     res.send(req.query.timestamp);
-// });
+app.get("/getTest", function(req,res){
+    garage.findAll().then(function(result){
+        var date = JSON.stringify(result[0].createdAt);
+        var date2 = new Date(date.substring(1,date.length - 1));
+        res.send(date2.getTime() + "");
+    });
+});
+
+app.get("/test3", function(req,res){
+    garage.find({
+        where: {
+            name: "SJSouth"
+        }
+    }).then(function(result){
+        
+    });
+});
 
 // app.get("/addColumn", function(req,res){
 //    garage.update({
