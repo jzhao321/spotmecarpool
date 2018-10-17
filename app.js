@@ -259,7 +259,7 @@ app.get("/log_garage", function(req, res){
 app.get("/fakeData", function(req,res){
     var date = Date.now();
     var count = 0;
-    for(var i = date; i >= (date - 100 * 360000); i -= 360000){
+    for(var i = date; i >= (date - 604800000); i -= 3600000){
         log.create({
             garage:"SJSouth",
             current: count * 5,
