@@ -1,8 +1,11 @@
+//Imports Dependencies
 var express = require('express');
 var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
 
+
+//Initializes Connection to Database
 var seq = new Sequelize("spotme_garages", "root", "spot123", {
     host: "35.227.173.37",
     dialect: "mysql",
@@ -16,6 +19,7 @@ var seq = new Sequelize("spotme_garages", "root", "spot123", {
     }
 });
 
+//Creates a Table (Model)
 const garage = seq.define("garage", {
     name: {
         type: Sequelize.STRING
@@ -35,6 +39,7 @@ const garage = seq.define("garage", {
 });
 
 
+//Takes in a location and returns current parking data
 route.post("/garage", function(req, res){
     garage.find({
         where:{
@@ -49,6 +54,7 @@ route.post("/garage", function(req, res){
     });
 });
 
+//Takes in an API Key, location, and command, logs the request, and updates the current number of spots
 route.get("/log_garage", function(req, res){
     if(req.query.API_KEY == "56ZXRQKLUO2i9P4DQMPH"){ //This is the API Key
         var toadd = 0;
@@ -97,6 +103,7 @@ route.get("/log_garage", function(req, res){
     }
 });
 
+// Takes in an API Key, location, from time, to time, and count and returns an array of graph data to be used in a line graph
 route.get("/getTime", function(req,res){
     if(req.query.API_KEY == "56ZXRQKLUO2i9P4DQMPH"){
         var space = (parseInt(req.query.to) - parseInt(req.query.from)) / (parseInt(req.query.count) * 2) ;
@@ -144,4 +151,6 @@ route.get("/getTime", function(req,res){
     }
 });
 
+
+//Exports this module to be used in the main app
 module.exports = route;

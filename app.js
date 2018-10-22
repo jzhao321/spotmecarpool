@@ -1,3 +1,4 @@
+//Imports Dependencies
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -5,21 +6,22 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var Sequelize = require("sequelize");
 var cors = require("cors");
-
 var app = express();
 
+//Adds Query operations in Sequelize
 var Op = Sequelize.Op;
 
+//Enables Cross Origin Requests (CORS) support
 app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 // app.use(express.static(path.join(__dirname, 'public')));
 
 // app.get("/Ddata", function(req,res){
@@ -84,42 +86,11 @@ app.use(cookieParser());
 
 // });
 
-/*
-
-API Map:
-
-/garages
-    /garage
-    /log_garage
-    /getTime
-
-/logging
-
-/signups
-
-/queries
-    /createQuery
-    /getQuery
-
-/debug
-    /fakeData
-    /allLogData
-    /clearLogTable
-    /testConnect
-    /addGarage
-    /delGarage
-    /updateGarage
-    /allData
-    /allQueries
-    /createTable
-
-*/
-
 //Debug Endpoints NOT TO BE IN FINAL PRODUCT
 var debug = require("./routes/debug.js");
 app.use("/debug", debug);
 
-//Deployment Endpoints
+//Product Endpoints
 var garages = require("./routes/garages.js");
 var logging = require("./routes/logging.js");
 var queries = require("./routes/queries.js");

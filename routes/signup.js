@@ -1,8 +1,11 @@
+//Imports Dependencies
 var express = require('express');
 var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
 
+
+//Initializes Connection to Database
 var seqSign = new Sequelize("signups", "root", "spot123", {
   host: "35.227.173.37",
   dialect: "mysql",
@@ -16,7 +19,9 @@ var seqSign = new Sequelize("signups", "root", "spot123", {
   }
 });
 
+//Creates a Table (Model)
 const signup = seqSign.define("signup", {
 });
 
+//Exports this module to be used in the main app
 module.exports = route;

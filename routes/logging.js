@@ -1,10 +1,11 @@
+//Imports Dependencies
 var express = require('express');
 var route = express.Router();
-
 var Sequelize = require("sequelize");
-
 var Op = Sequelize.Op;
 
+
+//Initializes Connection to Database
 var logData = new Sequelize("garageTimeData", "root", "spot123", {
   host: "35.227.173.37",
   dialect: "mysql",
@@ -18,6 +19,7 @@ var logData = new Sequelize("garageTimeData", "root", "spot123", {
   }
 });
 
+//Creates a Table (Model)
 const log = logData.define("timeLog", {
   garage: Sequelize.STRING,
   current: Sequelize.INTEGER,
@@ -75,5 +77,5 @@ const log = logData.define("timeLog", {
 // });
 
 
-
+//Exports this module to be used in the main app
 module.exports = route;
