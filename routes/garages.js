@@ -38,6 +38,27 @@ const garage = seq.define("garage", {
     }
 });
 
+//Initializes Connection to Database
+var logData = new Sequelize("garageTimeData", "root", "spot123", {
+    host: "35.227.173.37",
+    dialect: "mysql",
+    operatorsAliases:false,
+  
+    pool:{
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+  });
+  
+  //Creates a Table (Model)
+  const log = logData.define("timeLog", {
+    garage: Sequelize.STRING,
+    current: Sequelize.INTEGER,
+    time: Sequelize.BIGINT
+  });
+
 
 //Takes in a location and returns current parking data
 route.post("/garage", function(req, res){
