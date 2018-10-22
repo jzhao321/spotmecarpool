@@ -1,0 +1,49 @@
+API Map:
+
+/garages
+    /garage
+        POST:
+            body: name
+    /log_garage
+        GET: 
+            query: API_KEY, command, location
+    /getTime
+        GET:
+            query: API_KEY, to, from, count, location
+
+/logging
+
+/signups
+
+/queries
+    /createQuery
+        GET:
+            query: location
+    /getQuery
+        GET:
+            query: location, time
+
+/debug
+    /fakeData
+        GET
+    /allLogData
+        GET
+    /clearLogTable
+        GET
+    /testConnect
+        GET
+    /addGarage
+        POST:
+            body: name, current, max, upCount, downCount
+    /delGarage
+        POST:
+            body: name
+    /updateGarage
+        GET:
+            query: current, max, upCount, downCount, name
+    /allData
+        GET
+    /allQueries
+        GET
+    /createTable
+        GET
