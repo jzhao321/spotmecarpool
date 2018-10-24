@@ -3,6 +3,8 @@ var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
 
+//Tells when Debug is Loaded
+console.log("Debug Options Loaded");
 
 //Logging
 

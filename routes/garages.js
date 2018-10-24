@@ -50,14 +50,14 @@ var logData = new Sequelize("garageTimeData", "root", "spot123", {
         acquire: 30000,
         idle: 10000
     }
-  });
+});
   
-  //Creates a Table (Model)
-  const log = logData.define("timeLog", {
+//Creates a Table (Model)
+const log = logData.define("timeLog", {
     garage: Sequelize.STRING,
     current: Sequelize.INTEGER,
     time: Sequelize.BIGINT
-  });
+});
 
 
 //Takes in a location and returns current parking data
@@ -110,8 +110,8 @@ route.get("/log_garage", function(req, res){
                     time: date.getTime()
                 }).then(function(result3){
 
-                    res.send(JSON.stringify(result))
-                    
+                    // res.send(JSON.stringify(result))
+            
 
                 });
 
