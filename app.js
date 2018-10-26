@@ -87,18 +87,21 @@ app.use(cookieParser());
 // });
 
 //Debug Endpoints NOT TO BE IN FINAL PRODUCT
-// var debug = require("./routes/debug.js");
-// app.use("/debug", debug);
+var debug = require("./routes/debug.js");
+app.use("/debug", debug);
 
 //Product Endpoints
 var garages = require("./routes/garages.js");
 var logging = require("./routes/logging.js");
 var queries = require("./routes/queries.js");
 var signUps = require('./routes/signup');
+var calendar = require("./routes/calendar.js");
+app.use("/calendar", calendar);
 app.use("/garages", garages);
 app.use("/logging", logging);
 app.use("/queries", queries);
 app.use("/signups", signUps);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

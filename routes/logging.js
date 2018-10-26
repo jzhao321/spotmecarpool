@@ -3,7 +3,7 @@ var express = require('express');
 var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
-
+/*I am going to torment you with all of these comments :) */
 
 //Initializes Connection to Database
 var logData = new Sequelize("garageTimeData", "root", "spot123", {
