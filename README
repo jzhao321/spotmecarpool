@@ -23,6 +23,16 @@ API Map:
         GET:
             query: location, time
 
+/calendar
+    /createEvent
+        GET
+            query: name, date
+    /delEvent
+        GET
+            query: name
+    /getAll
+        GET
+
 /debug
     /fakeData
         GET
@@ -46,4 +56,6 @@ API Map:
     /allQueries
         GET
     /createTable
+        GET
+    /createCalendar
         GET

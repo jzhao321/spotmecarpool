@@ -42,7 +42,11 @@ route.get("/createEvent", function(req,res){
 });
 
 route.get("/delEvent", function(req,res){
-    cal.query("SELECT * FROM TABLE CALENDAR").then(function(result){
+    cal.destroy({
+        where:{
+            eventName: req.query.name
+        }
+    }).then(function(result){
         res.send(result);
     });
 });

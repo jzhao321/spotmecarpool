@@ -184,4 +184,34 @@ query.beforeFind(function(instance){
     console.log(instance);
 });
 
+
+//Calendar
+
+calSeq = new Sequelize("calendarEvents", "root", "spot123", {
+    host: "35.227.173.37",
+    dialect: "mysql",
+    operatorsAliases: false,
+
+    pool:{
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+});
+
+
+const cal = calSeq.define("events", {
+    eventName: Sequelize.STRING,
+    eventDate: Sequelize.BIGINT
+});
+
+route.get("/createCalendar", function(req,res){
+    cal.sync({
+        force: true
+    }).then(function(result){
+        res.send(JSON.stringify(result));
+    });
+});
+
 module.exports = route;
