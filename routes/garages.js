@@ -67,7 +67,7 @@ route.post("/garage", function(req, res){
             name: req.body.name
         },
         attributes:{
-            exclude: ["createdAt","updatedAt"]
+            exclude: ["createdAt","updatedAt","upCount","downCount"]
         }
 
     }).then(function(result){
