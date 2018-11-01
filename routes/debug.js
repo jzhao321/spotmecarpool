@@ -5,6 +5,9 @@ var Op = Sequelize.Op;
 
 //Tells when Debug is Loaded
 console.log("Debug Options Loaded");
+route.get("/version", function(req,res){
+    res.send("1.0");
+});
 
 //Logging
 
