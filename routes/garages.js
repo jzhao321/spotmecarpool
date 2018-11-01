@@ -91,7 +91,7 @@ route.get("/log_garage", function(req, res){
         }
         garage.update({
             [count]: Sequelize.literal(count + " + 1"),
-            current: Sequelize.literal("current + 1")
+            current: Sequelize.literal("current + " + toadd)
         }, {
             where: {
                 name: req.query.location
@@ -110,7 +110,7 @@ route.get("/log_garage", function(req, res){
                     time: date.getTime()
                 }).then(function(result3){
 
-                    // res.send(JSON.stringify(result))
+                    res.end();
             
 
                 });
