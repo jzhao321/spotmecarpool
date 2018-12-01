@@ -38,6 +38,13 @@ const garage = seq.define("garage", {
     }
 });
 
+const markers = seq.define("markers", {
+    name: Sequelize.STRING,
+    lat: Sequelize["DOUBLE PRECISION"],
+    lng: Sequelize["DOUBLE PRECISION"],
+    key: Sequelize.STRING
+});
+
 //Initializes Connection to Database
 var logData = new Sequelize("garageTimeData", "root", "spot123", {
     host: "35.227.173.37",
@@ -170,6 +177,37 @@ route.get("/getTime", function(req,res){
     else{
         res.send("API Key Invalid");
     }
+});
+
+route.get("/resetMarkers", (req, res) => {
+    markers.sync({
+        force: true
+    }).then((result) => {
+        res.send("Markers have been reset");
+    });
+});
+
+route.get("/setMarker", function(req, res){
+    // markers.sync({
+    //     force: true
+    // }).then((result) => {
+    //     res.send(JSON.stringify(result));
+    // });
+    markers.create({
+        name: req.query.name,
+        lat: req.query.lat,
+        lng: req.query.lng,
+        key: req.query.key
+    }).then((result) => {
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/getMarkers", (req, res) => {
+    markers.findAll({
+    }).then((result) => {
+        res.send(JSON.stringify(result));
+    });
 });
 
 
