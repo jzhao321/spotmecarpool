@@ -179,13 +179,7 @@ route.get("/getTime", function(req,res){
     }
 });
 
-route.get("/resetMarkers", (req, res) => {
-    markers.sync({
-        force: true
-    }).then((result) => {
-        res.send("Markers have been reset");
-    });
-});
+
 
 route.get("/setMarker", function(req, res){
     // markers.sync({

@@ -93,6 +93,21 @@ const garage = seq.define("garage", {
     }
 });
 
+const markers = seq.define("markers", {
+    name: Sequelize.STRING,
+    lat: Sequelize["DOUBLE PRECISION"],
+    lng: Sequelize["DOUBLE PRECISION"],
+    key: Sequelize.STRING
+});
+
+route.get("/resetMarkers", (req, res) => {
+    markers.sync({
+        force: true
+    }).then((result) => {
+        res.send("Markers have been reset");
+    });
+});
+
 route.get("/testConnect", function(req,res){
     seq.authenticate().then(function(errors){
         res.send("Connection Established");
@@ -216,5 +231,9 @@ route.get("/createCalendar", function(req,res){
         res.send(JSON.stringify(result));
     });
 });
+
+
+
+
 
 module.exports = route;
