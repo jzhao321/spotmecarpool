@@ -4,7 +4,8 @@ var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
 /*hi there Jame, you just tricked me into thinking that you
 were going to take a picture of the screen.*/
-calSeq = new Sequelize("calendarEvents", "root", "spot123", {
+
+var calSeq = new Sequelize("calendarEvents", "root", "spot123", {
     host: "35.227.173.37",
     dialect: "mysql",
     operatorsAliases: false,
@@ -42,8 +43,12 @@ route.get("/createEvent", function(req,res){
 });
 
 route.get("/delEvent", function(req,res){
-    cal.query("SELECT * FROM TABLE CALENDAR").then(function(result){
-        res.send(result);
+    cal.find({
+        where:{
+            eventName: req.query.name
+        }
+    }).then(function(result){
+        result.destroy();
     });
 });
 

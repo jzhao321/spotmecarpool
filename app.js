@@ -2,14 +2,12 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var Sequelize = require("sequelize");
 var cors = require("cors");
 var app = express();
 
 //Adds Query operations in Sequelize
-var Op = Sequelize.Op;
 
 //Enables Cross Origin Requests (CORS) support
 app.use(cors());
@@ -20,9 +18,8 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // app.get("/Ddata", function(req,res){
 //     garage.create({
@@ -101,11 +98,15 @@ app.use("/garages", garages);
 app.use("/logging", logging);
 app.use("/queries", queries);
 app.use("/signups", signUps);
+app.get("/", (req, res) => {
+    res.send("Spotme API running");
+})
 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  res.status(404);
+  res.send("404 File Not Found");
 });
 
 // error handler
