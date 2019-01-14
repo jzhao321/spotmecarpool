@@ -4,70 +4,42 @@ var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
 
+var seq = require("./resources/postGresData").seq;
+
+const garage = require("./resources/postGresData").garage;
+
+const markers = require("./resources/postGresData").markers;
+
+const log = require("./resources/postGresData").log;
+
+console.log(process.env.DATABASE_URL);
+
+
 
 //Initializes Connection to Database
-var seq = new Sequelize("spotme_garages", "root", "spot123", {
-    host: "35.227.173.37",
-    dialect: "mysql",
-    operatorsAliases:false,
-
-    pool:{
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    }
-});
-
-//Creates a Table (Model)
-const garage = seq.define("garage", {
-    name: {
-        type: Sequelize.STRING
-    },
-    current:{
-        type: Sequelize.INTEGER
-    },
-    max:{
-        type: Sequelize.INTEGER
-    },
-    upCount:{
-        type: Sequelize.INTEGER
-    },
-    downCount:{
-        type: Sequelize.INTEGER
-    }
-});
-
-//Initializes Connection to Database
-var logData = new Sequelize("garageTimeData", "root", "spot123", {
-    host: "35.227.173.37",
-    dialect: "mysql",
-    operatorsAliases:false,
+// var logData = new Sequelize("garageTimeData", "root", "spot123", {
+//     host: "35.227.173.37",
+//     dialect: "mysql",
+//     operatorsAliases:false,
   
-    pool:{
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    }
-});
-  
-//Creates a Table (Model)
-const log = logData.define("timeLog", {
-    garage: Sequelize.STRING,
-    current: Sequelize.INTEGER,
-    time: Sequelize.BIGINT
-});
-
+//     pool:{
+//         max: 5,
+//         min: 0,
+//         acquire: 30000,
+//         idle: 10000
+//     }
+// });
 
 //Takes in a location and returns current parking data
+
+
 route.post("/garage", function(req, res){
     garage.find({
         where:{
             name: req.body.name
         },
         attributes:{
-            exclude: ["createdAt","updatedAt"]
+            exclude: ["createdAt","updatedAt","upCount","downCount"]
         }
 
     }).then(function(result){
@@ -91,7 +63,7 @@ route.get("/log_garage", function(req, res){
             count = "upCount";
         }
         garage.update({
-            [count]: Sequelize.literal(count + " + 1"),
+            upCount: Sequelize.literal('"' + count + '"' + " + 1"),
             current: Sequelize.literal("current +" + toadd)
         }, {
             where: {
@@ -111,7 +83,7 @@ route.get("/log_garage", function(req, res){
                     time: date.getTime()
                 }).then(function(result3){
 
-                    //res.send(JSON.stringify(result3))
+                    res.send(JSON.stringify(result3))
             
 
                 });
@@ -171,6 +143,31 @@ route.get("/getTime", function(req,res){
     else{
         res.send("API Key Invalid");
     }
+});
+
+
+
+route.get("/setMarker", function(req, res){
+    // markers.sync({
+    //     force: true
+    // }).then((result) => {
+    //     res.send(JSON.stringify(result));
+    // });
+    markers.create({
+        name: req.query.name,
+        lat: req.query.lat,
+        lng: req.query.lng,
+        key: req.query.key
+    }).then((result) => {
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/getMarkers", (req, res) => {
+    markers.findAll({
+    }).then((result) => {
+        res.send(JSON.stringify(result));
+    });
 });
 
 

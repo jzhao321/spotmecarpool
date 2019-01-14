@@ -2,30 +2,18 @@ var express = require('express');
 var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
+var seq = require("./resources/postGresData").seq
+
 
 //Tells when Debug is Loaded
 console.log("Debug Options Loaded");
+route.get("/version", function(req,res){
+    res.send("1.0");
+});
 
 //Logging
 
-var logData = new Sequelize("garageTimeData", "root", "spot123", {
-    host: "35.227.173.37",
-    dialect: "mysql",
-    operatorsAliases:false,
-  
-    pool:{
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    }
-});
-  
-const log = logData.define("timeLog", {
-    garage: Sequelize.STRING,
-    current: Sequelize.INTEGER,
-    time: Sequelize.BIGINT
-});
+const log = require("./resources/postGresData").log;
 
 route.get("/fakeData", function(req,res){
     var date = Date.now();
@@ -57,37 +45,25 @@ route.get("/clearLogTable", function(req,res){
     });
 });
 
+route.get("/createLogTable", (req,res) => {
+    log.sync({
+    }).then((result) => {
+        res.send("log table created")
+    })
+})
+
 //Garages
 
-var seq = new Sequelize("spotme_garages", "root", "spot123", {
-    host: "35.227.173.37",
-    dialect: "mysql",
-    operatorsAliases:false,
+const garage = require("./resources/postGresData").garage
 
-    pool:{
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    }
-});
+const markers = require("./resources/postGresData").markers
 
-const garage = seq.define("garage", {
-    name: {
-        type: Sequelize.STRING
-    },
-    current:{
-        type: Sequelize.INTEGER
-    },
-    max:{
-        type: Sequelize.INTEGER
-    },
-    upCount:{
-        type: Sequelize.INTEGER
-    },
-    downCount:{
-        type: Sequelize.INTEGER
-    }
+route.get("/resetMarkers", (req, res) => {
+    markers.sync({
+        force: true
+    }).then((result) => {
+        res.send("Markers have been reset");
+    });
 });
 
 route.get("/testConnect", function(req,res){
@@ -142,46 +118,5 @@ route.get("/allData", function(req,res){
     });
 });
 
-//Queries
-
-var spotQuery = new Sequelize("spotquery", "root", "spot123", {
-    host: "35.227.173.37",
-    dialect: "mysql",
-    operatorsAliases:false,
-
-    pool:{
-        max:5,
-        min:0,
-        acquire: 30000,
-        idle: 10000
-    }
-});
-
-const query = spotQuery.define("spotQueries",{
-    location: Sequelize.STRING,
-    time: Sequelize.BIGINT
-});
-
-route.get("/allQueries", function(req,res){
-    query.findAll({}).then(function(result){
-        res.send(JSON.stringify(result));
-    });
-});
-
-route.get("/createTable", function(req,res){
-    query.sync({force: true}).then(function(result){
-        res.send(JSON.stringify(result));
-    });
-});
-
-query.beforeCreate(function(instance){
-    if(instance.location == null){
-        throw new Error("This Query does not have a location");
-    }
-});
-
-query.beforeFind(function(instance){
-    console.log(instance);
-});
 
 module.exports = route;
