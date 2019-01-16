@@ -1,28 +1,33 @@
 //Imports Dependencies
-var express = require('express');
-var path = require('path');
-var app = express();
-var pg = require("pg");
+import express from "express";
+import path from "path";
+import pg from "pg";
+import cors from "cors";
+
+//Set PostGres defualt options
 pg.defaults.ssl = true;
 
+//Declare application variable for express
+var app = express();
+
 //Enables Cross Origin Requests (CORS) support
-app.use(require("cors")());
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(require("morgan")("dev")); //Logger for Web
+//app.use(require("morgan")("dev")); //Logger for Web
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Debug Endpoints NOT TO BE IN FINAL PRODUCT
-var debug = require("./routes/debug.js");
+//ONLY IN DEVELOPMENT NOT TO BE IN FINAL PRODUCT
+import debug from "./debug"
 app.use("/debug", debug);
 
-//Product Endpoints
-var garages = require("./routes/garages.js");
+//Production Endpoints
+import garages from "./garages";
 app.use("/garages", garages);
 
 app.get("/", (req, res) => {
@@ -31,13 +36,13 @@ app.get("/", (req, res) => {
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   res.status(404);
   res.send("404 File Not Found");
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -47,4 +52,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+
+export default app;

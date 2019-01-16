@@ -1,26 +1,23 @@
-var express = require('express');
+import express from "express";
 var route = express.Router();
-var Sequelize = require("sequelize");
-var Op = Sequelize.Op;
-var seq = require("./resources/postGresData").seq
+
+import { seq, log, garage, markers } from "./resources/postGresData";
 
 
 //Tells when Debug is Loaded
 console.log("Debug Options Loaded");
-route.get("/version", function(req,res){
+route.get("/version", (req, res) => {
     res.send("1.0");
 });
 
 //Logging
 
-const log = require("./resources/postGresData").log;
-
-route.get("/fakeData", function(req,res){
+route.get("/fakeData",(req, res) => {
     var date = Date.now();
     var count = 0;
-    for(var i = (date - 604800000); i <= date; i += 3600000){
+    for (var i = (date - 604800000); i <= date; i += 3600000) {
         log.create({
-            garage:"SJSouth",
+            garage: "SJSouth",
             current: count * 5,
             time: i
         })
@@ -31,21 +28,21 @@ route.get("/fakeData", function(req,res){
 
 });
 
-route.get("/allLogData", function(req,res){
-    log.findAll().then(function(result){
-        res.send(JSON.stringify(result));
-    });
-});
-  
-route.get("/clearLogTable", function(req,res){
-    log.sync({
-        force: true
-    }).then(function(result){
+route.get("/allLogData", (req, res) => {
+    log.findAll().then(function (result) {
         res.send(JSON.stringify(result));
     });
 });
 
-route.get("/createLogTable", (req,res) => {
+route.get("/clearLogTable", (req, res) => {
+    log.sync({
+        force: true
+    }).then(function (result) {
+        res.send(JSON.stringify(result));
+    });
+});
+
+route.get("/createLogTable", (req, res) => {
     log.sync({
     }).then((result) => {
         res.send("log table created")
@@ -53,10 +50,6 @@ route.get("/createLogTable", (req,res) => {
 })
 
 //Garages
-
-const garage = require("./resources/postGresData").garage
-
-const markers = require("./resources/postGresData").markers
 
 route.get("/resetMarkers", (req, res) => {
     markers.sync({
@@ -66,57 +59,56 @@ route.get("/resetMarkers", (req, res) => {
     });
 });
 
-route.get("/testConnect", function(req,res){
-    seq.authenticate().then(function(errors){
+route.get("/testConnect", (req, res) => {
+    seq.authenticate().then(function (errors) {
         res.send("Connection Established");
-    }).catch(function(err){
+    }).catch((err) => {
         console.error("Unable to connect to the database: ", err);
         res.send("Unable to connect to the database");
     });
 });
 
-route.post("/addGarage", function(req,res){
+route.get("/addGarage", (req, res) => {
     garage.create({
         name: req.body.name,
         current: req.body.current,
         max: req.body.max,
         upCount: req.body.upCount,
         downCount: req.body.downCount
-    }).then(function(result){
+    }).then((result) => {
         res.send(JSON.stringify(result));
     });
 });
 
-route.post("/delGarage", function(req,res){
+route.get("/delGarage", (req, res) => {
     garage.destroy({
         where: {
             name: req.body.name
         }
-    }).then(function(result){
+    }).then((result) => {
         res.send(JSON.stringify(result));
     });
 });
 
-route.get("/updateGarage", function(req,res){
+route.get("/updateGarage", (req, res) => {
     garage.update({
-        current:req.query.current,
+        current: req.query.current,
         max: req.query.max,
         upCount: req.query.upCount,
         downCount: req.query.downCount
-    },{
-        where:{
-            name: req.query.name
-        }
-    }).then(function(result){
-        res.send(result);
-    });
+    }, {
+            where: {
+                name: req.query.name
+            }
+        }).then((result) => {
+            res.send(result);
+        });
 });
 
-route.get("/allData", function(req,res){
-    garage.findAll().then(function(result){
+route.get("/allData", (req, res) => {
+    garage.findAll().then((result) => {
         res.send(JSON.stringify(result));
     });
 });
 
-
-module.exports = route;
+export default route;

@@ -1,11 +1,10 @@
-var express = require("express");
-var Sequelize = require("sequelize");
+import Sequelize from "sequelize";
 
+export var seq = new Sequelize(process.env.DATABASE_URL, {
+    logging: false,
+});
 
-
-var seq = new Sequelize(process.env.DATABASE_URL);
-
-const garage = seq.define("garage", {
+export const garage = seq.define("garage", {
     name: {
         type: Sequelize.STRING
     },
@@ -23,24 +22,15 @@ const garage = seq.define("garage", {
     }
 });
 
-const markers = seq.define("markers", {
+export const markers = seq.define("markers", {
     name: Sequelize.STRING,
     lat: Sequelize["DOUBLE PRECISION"],
     lng: Sequelize["DOUBLE PRECISION"],
     key: Sequelize.STRING
 });
 
-const log = seq.define("timeLog", {
+export const log = seq.define("timeLog", {
     garage: Sequelize.STRING,
     current: Sequelize.INTEGER,
     time: Sequelize.BIGINT
 });
-
-
-module.exports.seq = seq;
-
-module.exports.garage = garage;
-
-module.exports.markers = markers;
-
-module.exports.log = log;

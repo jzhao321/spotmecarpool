@@ -4,42 +4,20 @@ var route = express.Router();
 var Sequelize = require("sequelize");
 var Op = Sequelize.Op;
 
-var seq = require("./resources/postGresData").seq;
-
 const garage = require("./resources/postGresData").garage;
 
 const markers = require("./resources/postGresData").markers;
 
 const log = require("./resources/postGresData").log;
 
-console.log(process.env.DATABASE_URL);
 
-
-
-//Initializes Connection to Database
-// var logData = new Sequelize("garageTimeData", "root", "spot123", {
-//     host: "35.227.173.37",
-//     dialect: "mysql",
-//     operatorsAliases:false,
-  
-//     pool:{
-//         max: 5,
-//         min: 0,
-//         acquire: 30000,
-//         idle: 10000
-//     }
-// });
-
-//Takes in a location and returns current parking data
-
-
-route.post("/garage", function(req, res){
-    garage.find({
+route.get("/garage", function(req, res){
+    garage.findOne({
         where:{
-            name: req.body.name
+            name: req.query.name
         },
         attributes:{
-            exclude: ["createdAt","updatedAt","upCount","downCount"]
+            exclude: ["createdAt","updatedAt"]
         }
 
     }).then(function(result){
@@ -53,7 +31,6 @@ route.get("/log_garage", function(req, res){
         var toadd = 0;
         var count;
         var date = new Date();
-        // console.log(req.query.command);
         if(req.query.command == "out"){
             toadd = -1;
             count = "downCount";
@@ -109,7 +86,7 @@ route.get("/getTime", function(req,res){
                 max: Math.floor((parseInt(req.query.from ) + space * 2 * count) + space)
             });
         }
-        console.log(groups);
+        //console.log(groups);
         log.findAll({
             where:{
                 garage: req.query.location,

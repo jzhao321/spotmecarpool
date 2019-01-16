@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+import app from "./app.js";
 var debug = require('debug')('spotmesolutions:server');
-var http = require('http');
+import http from "http";
 
 /**
  * Get port from environment and store in Express.
@@ -31,8 +31,7 @@ server.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
-
-function normalizePort(val) {
+function normalizePort(val){
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -51,8 +50,7 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-
-function onError(error) {
+function onError(error){
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -80,7 +78,7 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+function onListening(){
   var addr = server.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
