@@ -1,27 +1,26 @@
 {
-  "name": "spotmesolutions",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "test": "jest",
-    "build": "babel ./src -d ./lib",
-    "start": "npm run build && node ./lib/index.js",
-    "startOld": "node ./src/index.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.16.4",
-    "http-errors": "^1.7.1",
-    "jade": "^1.11.0",
-    "mysql2": "^1.6.4",
-    "pg": "^7.8.0",
-    "sequelize": "^4.42.0"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
-    "jest": "^23.6.0",
-    "morgan": "^1.9.1"
-  }
+    "name": "spotmesolutions",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "test": "jest",
+        "build": "babel ./src -d ./lib",
+        "start": "node ./lib/index.js",
+        "build_start": "npm run build && npm run start"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.16.4",
+        "http-errors": "^1.7.1",
+        "jade": "^1.11.0",
+        "mysql2": "^1.6.4",
+        "pg": "^7.8.0",
+        "sequelize": "^4.42.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.2.3",
+        "@babel/core": "^7.2.2",
+        "@babel/preset-env": "^7.2.3",
+        "morgan": "^1.9.1"
+    }
 }
