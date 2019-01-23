@@ -48,7 +48,7 @@ route.get("/log_garage", function(req, res){
             }
         }).then(function(result){
 
-            garage.find({
+            garage.findOne({
                 where:{
                     name: req.query.location
                 }
