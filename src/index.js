@@ -1,87 +1,117 @@
-
-/**
- * Module dependencies.
- */
-
-import app from "./app.js";
-var debug = require('debug')('spotmesolutions:server');
 import http from "http";
+import express from "express";
+import Sequelize from "sequelize"
+import pg from "pg";
+import bodyParser from "body-parser";
 
-/**
- * Get port from environment and store in Express.
- */
+const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+pg.defaults.ssl = true;
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
 
-/**
- * Create HTTP server.
- */
+const seq = new Sequelize("postgres://bmsnyakizhvtiv:9ca4b6e65fd79862767d73971fdbf0da9d1de25422281b63e8a7ca8214e72c9b@ec2-54-163-234-88.compute-1.amazonaws.com:5432/delahu46rivvsb",{
+    ssl:true
+});
 
-var server = http.createServer(app);
+const emailModel = seq.define("registrations", {
+    firstName: Sequelize.STRING,
+    lastName: Sequelize.STRING,
+    email: Sequelize.STRING,
+    phoneNumber: Sequelize.BIGINT,
+    password: Sequelize.STRING,
+  });
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+app.get("/createTable", (req, res) => {
+    emailModel.sync().then(() => {
+    res.send("Table created successfully");
+  }).catch((error) => {
+    res.send(error);
+  })
+});
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+//get returns email and phone number given first & last name 
+app.get('/getData', function(req, res){
+    emailModel.findOne({
+        where:{
+            firstName: req.params.firstName,
+            lastName: req.params.lastName
+        },
+        attributes:{
+            include:["email", "phoneNumber", "password"],
+            exclude:["firstName", "lastName", "id", "createdAt", "updatedAt"]
+      }
+    }).then(user =>{
+        res.send(user);
+    })
+ });
+ 
+ //post a user to database
+ app.post('/createAccount', function(req, res){
+    let email = req.body.email;
+    let phone = req.body.phoneNumber;
+    let fName =req.body.firstName;
+    let lName = req.body.lastName;
+    let pass = req.body.password;
 
-/**
- * Normalize a port into a number, string, or false.
- */
-function normalizePort(val){
-  var port = parseInt(val, 10);
+    //check if any attributes are null
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if(email && fName && lName && phone && pass){
+    //check if valid phone number
+        if(phone.length != 10  || (!typeof phone === 'bigint')){
+            res.send("Invalid phone number")
+        }
+        //check if valid email
+        else if(email.substring(email.length-9, email.length) != "@sjsu.edu"){
+            res.send("Invalid email")
+        }
+        //if both phone number and email are valid create new emailModel
+        else{
+            emailModel.findOrCreate({
+                where:{
+                    email: email
+                },
+                defaults:{    
+                    firstName: fName,
+                    lastName: lName,
+                    email: email,
+                    phoneNumber: phone,
+                    password: pass,
+                }
+            }).then((result) => {
+                res.send(result);
+            });
+        }
+    }
+    else
+        res.send("Error");
+});
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
 
-  return false;
-}
+app.post("/loginValidation", (req, res) => {
+	emailModel.findOne({
+    where: {
+      email: req.body.email
+    }
+  }).then(result => {
+    if(result){
+      
+      if(req.body.password === result.password){
+        res.send("Successfully logged in");
+      }
+      
+      else{
+        res.send("Error Logging In");
+      }
+      
+    }
+    else{
+      res.send("Error Logging In")
+    }
+    
+  })
+})
 
-/**
- * Event listener for HTTP server "error" event.
- */
-function onError(error){
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-
-function onListening(){
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
+app.listen(3000);
