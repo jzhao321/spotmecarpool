@@ -2,10 +2,10 @@
   "name": "spotme",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "tripCreation.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./lib/index.js",
+    "start": "node ./lib/tripCreation.js",
     "build": "babel ./src -d ./lib",
     "build_start": "npm run build && npm run start"
   },
