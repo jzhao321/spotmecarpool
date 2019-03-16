@@ -100,7 +100,7 @@ app.post("/tripHistory", (req, res) => {
     let user=req.body.user;
     
     riderlistings.findAll({
-        limit: 3, 
+        limit: 3,         //only retun 3 most recent history 
         order: [['time', 'DESC']],
         attributes:[
          "driver",
