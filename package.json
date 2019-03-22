@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "src",
+=======
+  "name": "spotme",
+>>>>>>> 4d911aa3f6955f8992de939ccd833c1d9a769791
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -15,10 +19,16 @@
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+<<<<<<< HEAD
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "nodemailer": "^5.1.1",
+=======
+    "body-parser": "^1.18.3",
+    "espress": "0.0.0",
+    "express": "^4.16.4",
+>>>>>>> 4d911aa3f6955f8992de939ccd833c1d9a769791
     "pg": "^7.8.2",
     "sequelize": "^4.43.0"
   }
