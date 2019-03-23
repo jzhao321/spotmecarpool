@@ -20,12 +20,17 @@ const emailModel = seq.define("registrations", {
     firstName: Sequelize.STRING,
     lastName: Sequelize.STRING,
     email: Sequelize.STRING,
-    phoneNumber: Sequelize.BIGINT,
     password: Sequelize.STRING,
+    driver: Sequelize.BOOLEAN,
+    carMake: Sequelize.STRING,
+    carModel: Sequelize.STRING,
+    carYear: Sequelize.INTEGER
   });
 
 app.get("/createTable", (req, res) => {
-    emailModel.sync().then(() => {
+    emailModel.sync({
+        force: true
+    }).then(() => {
     res.send("Table created successfully");
   }).catch((error) => {
     res.send(error);
@@ -36,11 +41,12 @@ app.get("/createTable", (req, res) => {
 app.get('/getData', function(req, res){
     emailModel.findOne({
         where:{
+            //change to email
             firstName: req.params.firstName,
             lastName: req.params.lastName
         },
         attributes:{
-            include:["email", "phoneNumber", "password"],
+            include:["email", "password"],
             exclude:["firstName", "lastName", "id", "createdAt", "updatedAt"]
       }
     }).then(user =>{
@@ -51,24 +57,35 @@ app.get('/getData', function(req, res){
  //post a user to database
  app.post('/createAccount', function(req, res){
     let email = req.body.email;
-    let phone = req.body.phoneNumber;
     let fName =req.body.firstName;
     let lName = req.body.lastName;
     let pass = req.body.password;
 
     //check if any attributes are null
 
-    if(email && fName && lName && phone && pass){
-    //check if valid phone number
-        if(phone.length != 10  || (!typeof phone === 'bigint')){
-            res.send("Invalid phone number")
-        }
+    if(email && fName && lName && pass){
+    
         //check if valid email
-        else if(email.substring(email.length-9, email.length) != "@sjsu.edu"){
+        if(email.substring(email.length-9, email.length) != "@sjsu.edu"){
             res.send("Invalid email")
         }
-        //if both phone number and email are valid create new emailModel
+        //check password is at least 8 long and has one lowercase, uppercase,number and special char
+        let passVer= true;
+        let strong = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+        if(!(strong.test(pass)))
+            passVer = false;
+        if(!passVer){
+            res.send("Invalid password")
+        }
+        //if  password and email is valid create new emailModel
         else{
+            email = email.substring(0, email.length-9).replace(".", "") + email.substring(email.length-9, email.length);
+            for(let i=0; i< email.length-9; i++){
+                if(email.charAt(i) == '+'){
+                    email = email.substring(0,i) + email.substring(email.length-9, email.length);
+                break;
+                }
+            }
             emailModel.findOrCreate({
                 where:{
                     email: email
@@ -77,8 +94,11 @@ app.get('/getData', function(req, res){
                     firstName: fName,
                     lastName: lName,
                     email: email,
-                    phoneNumber: phone,
                     password: pass,
+                    driver: false,
+                    carMake: null,
+                    carModel: null,
+                    carYear: null
                 }
             }).then((result) => {
                 res.send(result);
@@ -89,6 +109,9 @@ app.get('/getData', function(req, res){
         res.send("Error");
 });
 
+app.post("/driverVerification", (req, res) => {
+
+})
 
 app.post("/loginValidation", (req, res) => {
 	emailModel.findOne({
