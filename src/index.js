@@ -109,8 +109,33 @@ app.get('/getData', function(req, res){
         res.send("Error");
 });
 
+//returns boolean, true if email  exists & license is valid, false otherwise
 app.post("/driverVerification", (req, res) => {
+    let license = req.licenseNumber
 
+    //see if email exists
+    emailModel.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(result => {
+        if(result){
+            //check if license is valid (change this later)
+            let valid = true;
+            if(valid){
+                result.driver = true;
+                result.carMake = req.body.carMake;
+                result.carModel = req.body.carModel;
+                result.carYear = req.body.carYear;
+                res.send(true);
+            }
+            else
+                res.send(false)
+        }
+            else
+                res.send(false)
+        })
+    
 })
 
 app.post("/loginValidation", (req, res) => {
