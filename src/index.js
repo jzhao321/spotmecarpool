@@ -4,6 +4,7 @@ const app = express();
 import Sequelize from "sequelize";
 import pg from "pg";
 import bodyParser from "body-parser";
+import { runInNewContext } from "vm";
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
@@ -21,7 +22,6 @@ const emailModel = seq.define("registrations", {
   lastName: Sequelize.STRING,
   email: Sequelize.STRING,
   password: Sequelize.STRING,
-  phoneNumber: Sequelize.BIGINT,
 });
 
 // curl localhost:3000/createTable
@@ -40,10 +40,9 @@ app.post("/createAccount", (req, res) => {
   let email = req.body.email;
   let fName = req.body.firstName;
   let lName = req.body.lastName;
-  let phone = req.body.phoneNumber;
   let password = req.body.password
   
-	if(email && fName && lName && phone && password){
+	if(email && fName && lName && password){
     emailModel.findOrCreate({
       where:{
         email: email
@@ -52,9 +51,7 @@ app.post("/createAccount", (req, res) => {
         email: email,
         firstName: fName,
         lastName: lName,
-        phoneNumber: phone,
         password: password
-        
       }
     }).then((result) => {
       res.send(result);
@@ -87,13 +84,39 @@ app.post("/loginValidation", (req, res) => {
     }
     
   })
-})
+});
+//change the information data in the database
+app.post("/changeProfile", (req, res) => {
+  let newfName = req.body.firstName;
+  let newlName = req.body.lastName;
+  let newpassword = req.body.password
+    emailModel.findOne({
+      where: {
+        email: req.body.email
+      }
+    }).then(result => {
+      result.update({
+        firstName: newfName,
+        lastName: newlName,
+        password: newpassword,
+      }).then(() => {
+        res.send("update successfully")
+      })
+    })
+});
+//show the account information
+app.get("/profile", (req, res) => {
+  emailModel.findOne({
+    where:{
+      email: req.body.email
+    }
+  }).then((result) => {
+    let firstName = result.dataValues.firstName;
+    let lastName = result.dataValues.lastName;
+    let email = result.dataValues.email;
+    let password = result.dataValues.password;
+    res.send(firstName + ", " + lastName + ", " + email + ", " + password);
+    })
+});
 
-
-app.listen(3000);
-
-
-
-
-
-
+app.listen(1000);
