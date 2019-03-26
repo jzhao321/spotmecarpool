@@ -17,7 +17,6 @@ const seq = new Sequelize("postgres://bmsnyakizhvtiv:9ca4b6e65fd79862767d73971fd
 })
 
 const riderlistings = seq.define("riderlistings",{
-    driver:Sequelize.STRING,
     rider:Sequelize.STRING,
     pickUpStNo:Sequelize.STRING,
     pickUpStName: Sequelize.STRING,
@@ -27,24 +26,49 @@ const riderlistings = seq.define("riderlistings",{
     destinationStName: Sequelize.STRING,
     destinationCity:Sequelize.STRING,
     destinationZip:Sequelize.STRING,
-    time: Sequelize.DATE,
-    
+    starttime: Sequelize.DATE,
+    endtime: Sequelize.DATE,
+
+});
+const driverlistings = seq.define("driverlistings",{
+  driver:Sequelize.STRING,
+  pickUpStNo:Sequelize.STRING,
+  pickUpStName: Sequelize.STRING,
+  pickUpCity:Sequelize.STRING,
+  pickUpZip:Sequelize.STRING,
+  destinationStNo:Sequelize.STRING,
+  destinationStName: Sequelize.STRING,
+  destinationCity:Sequelize.STRING,
+  destinationZip:Sequelize.STRING,
+  starttime: Sequelize.DATE,
+  endtime: Sequelize.DATE,
 
 });
 
-app.get("/createTripTable", (req, res) => {
+app.get("/createRiderlistings", (req, res) => {
     riderlistings.sync({
         force: true
     }).then(() => {
-    res.send("Table created successfully");
+    res.send("riderlistings created successfully");
   }).catch((error) => {
     res.send(error);
   })
+
 });
 
-app.post("/addTrip",(req,res) => {
-    let driver =req.body.driver;
-    let rider =req.body.rider;
+app.get("/createDriverlistings", (req, res) => {
+
+driverlistings.sync({
+  force: true
+}).then(() => {
+  res.send("driverlistings created successfully");
+}).catch((error) => {
+  res.send(error);
+})
+});
+
+app.post("/riderAddTrip",(req,res) => {
+    let user =req.body.rider;
     let pStNo =req.body.pickUpStNo ;
     let pStName =req.body.pickUpStName;
     let pCity =req.body.pickUpCity;
@@ -53,26 +77,22 @@ app.post("/addTrip",(req,res) => {
     let dStName =req.body.destinationStName;
     let dCity =req.body.destinationCity;
     let dZip =req.body.destinationZip;
-    let time=req.body.time;
+    let stime=req.body.starttime;
+    let etime=req.body.endtime;
    
 
-    if((rider||driver) && pStNo && pStName && pCity && pZip
-        && dStNo && dStName && dCity && dZip&& time){
+    if(user && pStNo && pStName && pCity && pZip
+        && dStNo && dStName && dCity && dZip&& stime&&etime){
         riderlistings.findOrCreate({
          where:{
-          $or: [{
-            driver:driver,
-            time:time
-           },
-           {
-             rider:rider,
-             time:time
-           }]
-          
-          },
+          rider:user,
+          $or: {
+            starttime:stime,
+             endtime:etime,
+          }
+        },
           defaults:{
-            driver:driver,
-            rider:rider,
+            rider:user,
             pickUpStNo:pStNo,
             pickUpStName: pStName,
             pickUpCity:pCity,
@@ -81,31 +101,104 @@ app.post("/addTrip",(req,res) => {
             destinationStName: dStName,
             destinationCity:dCity,
             destinationZip:dZip,
-            time:time
-        
+            starttime:stime,
+            endtime:etime,
           }
         }).then((result) => {
 
             res.send(result[1]);
         })
-          
-        
         }
       else{
-        res.send("input field not completed");
+        res.send("input field not completed, rider add trip failed");
       }
 });
 
-app.post("/tripHistory", (req, res) => {
+app.post("/driverAddTrip",(req,res) => {
+  let user =req.body.driver;
+  let pStNo =req.body.pickUpStNo ;
+  let pStName =req.body.pickUpStName;
+  let pCity =req.body.pickUpCity;
+  let pZip =req.body.pickUpZip;
+  let dStNo =req.body.destinationStNo;
+  let dStName =req.body.destinationStName;
+  let dCity =req.body.destinationCity;
+  let dZip =req.body.destinationZip;
+  let stime=req.body.starttime;
+  let etime=req.body.endtime;
+ 
+
+  if(user && pStNo && pStName && pCity && pZip
+      && dStNo && dStName && dCity && dZip&& stime&&etime){
+      driverlistings.findOrCreate({
+       where:{
+        driver:user,
+        $or: {
+          starttime:stime,
+           endtime:etime,
+        }
+      },
+        defaults:{
+          driver:user,
+          pickUpStNo:pStNo,
+          pickUpStName: pStName,
+          pickUpCity:pCity,
+          pickUpZip:pZip,
+          destinationStNo:dStNo,
+          destinationStName: dStName,
+          destinationCity:dCity,
+          destinationZip:dZip,
+          starttime:stime,
+          endtime:etime,
+        }
+      }).then((result) => {
+
+          res.send(result[1]);
+      })
+      }
+    else{
+      res.send("input field not completed, rider add trip failed");
+    }
+});
+
+app.post("/ridertripHistory", (req, res) => {
     let user=req.body.user;
-    
     riderlistings.findAll({
+      limit: 3,         //only retun 3 most recent history 
+      order: [['starttime', 'DESC']],
+      attributes:[
+       "rider",
+       "starttime",
+       "endtime",
+       "pickUpStNo",
+       "pickUpStName",
+       "pickUpCity",
+       "pickUpZip",
+       "destinationStNo",
+       "destinationStName",
+       "destinationCity",
+       "destinationZip"]   ,
+      where: { 
+          rider:user
+      
+    },
+      }).then((result) => {
+
+          res.send(result);
+      })
+    
+})
+
+app.post("/drivertripHistory", (req, res) => {
+  let user=req.body.user;
+  
+      driverlistings.findAll({
         limit: 3,         //only retun 3 most recent history 
-        order: [['time', 'DESC']],
+        order: [['starttime', 'DESC']],
         attributes:[
          "driver",
-         "rider",
-         "time",
+         "starttime",
+         "endtime",
          "pickUpStNo",
          "pickUpStName",
          "pickUpCity",
@@ -115,17 +208,16 @@ app.post("/tripHistory", (req, res) => {
          "destinationCity",
          "destinationZip"]   ,
         where: { 
-          $or:{
-            driver:user,
-            rider:user}
+            driver:user
         }
         }).then((result) => {
 
             res.send(result);
         })
-          
+      
         
+      
+      
 })
-
 
 app.listen(3000);
