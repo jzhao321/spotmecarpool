@@ -162,4 +162,31 @@ app.post("/loginValidation", (req, res) => {
   })
 })
 
+//stripe 
+require('dotenv').config();
+const keyPublishable = process.env.STRIPE_PUBLIC;
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
+
+app.post('/charge', (req, res, next) => {
+
+  const token = req.body.stripeToken;
+  
+  stripe.customers.create({
+      //email: req.body.email,
+      source: token
+  })
+  .then(customer => 
+  
+  stripe.charges.create({
+    amount: 500,
+    currency: 'usd',
+    customer: customer.id,
+    description: 'carpool',
+  }))
+  .then(charge => res.send('Thank you')
+  ).catch(error  => {
+    res.send(error); 
+  });
+});
+
 app.listen(3000);
